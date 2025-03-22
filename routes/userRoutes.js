@@ -5,6 +5,7 @@ const router = express.Router()
 
 router.post("/register", UserController.createUser)
 router.post("/login", UserController.loginUser)
+router.post("/oauth", UserController.ouathLogin)
 router.get("/", UserController.getAllUsers)
 router.get("/:id", UserController.getUserById)
 router.put("/:id", UserController.updateUser)

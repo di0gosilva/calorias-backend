@@ -37,7 +37,6 @@ const UserController = {
             if(!email || !password) return res.status(400).json({ error: 'Email e senha são obrigatórios.' })
 
             const user = await User.findOne({ where: { email } })
-
             if(!user) return res.status(404).json({ error: 'Usuário não encontrado.' })
 
             if(!user.provider) {
@@ -51,6 +50,31 @@ const UserController = {
             
             const token = generateToken({ id: user.id })
             return res.status(200).json({ message: "Login realizado com sucesso.", user, token })
+        } catch(error) {
+            return res.status(400).json({ error: error.message })
+        }
+    },
+
+    async oauthLogin(req, res) {
+        try {
+            const { provider, provider_id, name, email, avatar } = req.body
+
+            if(!provider || !provider_id || !email) return res.status(400).json({ error: "Dados de autenticação inválidos. "})
+        
+            let user = await User.findOne({ where: { provider, provider_id }})
+            if(!user) {
+                user = await User.create({
+                    name, 
+                    email,
+                    provider,
+                    provider_id,
+                    profile_picture: avatar,
+                })
+            }
+
+            const token = generateToken({ id: user.id })
+
+            return res.status(200).json({ message: "Login OAuth realizado com sucesso.", user, token })        
         } catch(error) {
             return res.status(400).json({ error: error.message })
         }
