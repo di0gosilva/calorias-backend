@@ -1,3 +1,5 @@
+import cors from "cors"
+
 require("dotenv").config()
 const express = require("express")
 const Database = require("./config/database")
@@ -14,6 +16,23 @@ const app = express()
 
 app.use(rateLimiter)
 app.use(express.json())
+app.use(
+    cors({
+        origin: ["http://localhost:3000", "https://calorias-frontend.vercel.app"],
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+        credentials: true,
+    })
+)
+
+if(process.env.NODE_ENV === "production") {
+    app.use((req, res, next) => {
+        if(req.headers["x-forwarded-proto"] !== "https") {
+            return res.redirect(`https://${req.headers.host}${req.url}`)
+        }
+        next()
+    })
+}
 
 const database = new Database()
 database.connect().then(() => {
