@@ -59,10 +59,13 @@ const UserController = {
     },
 
     async oauthLogin(req, res) {
+        console.log("Requisição recebida no /oauth:", req.body);
         try {
             const { tokenId } = req.body
-            if(!token) return res.status(400).json({ error: "Token de autenticação inválido." })
+            if(!tokenId) return res.status(400).json({ error: "Token de autenticação inválido." })
             
+            console.log("Token recebido:", tokenId)
+
             const ticket = await client.verifyIdToken({
                 idToken: tokenId,
                 audience: process.env.GOOGLE_CLIENT_ID,
@@ -70,6 +73,8 @@ const UserController = {
 
             const payload = ticket.getPayload()
             if(!payload) return res.status(400).json({ error: "Erro ao validar token do Google." })
+            
+            console.log("Payload recebido:", payload);
 
             const { sub: provider_id, name, email, picture: avatar } = payload
             const provider = "google"
@@ -86,6 +91,8 @@ const UserController = {
             }
 
             const token = generateToken({ id: user.id })
+
+            console.log("Usuário autenticado com sucesso:", user);
 
             return res.status(200).json({ message: "Login OAuth realizado com sucesso.", user, token })        
         } catch(error) {
