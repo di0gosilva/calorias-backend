@@ -13,6 +13,8 @@ const foodDatabaseRoutes = require("./routes/foodDatabaseRoutes")
 
 const app = express()
 
+app.set("trust proxy", 1)
+
 app.use(rateLimiter)
 app.use(express.json())
 app.use(
