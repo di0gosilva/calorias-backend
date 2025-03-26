@@ -1,5 +1,8 @@
 const { User } = require('../models')
 const { generateToken, hashPassword, comparePassword } = require('../utils/auth')
+const { OAuth2Client } = require("google-auth-library")
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
 const UserController = {
     async createUser(req, res) {
@@ -57,9 +60,19 @@ const UserController = {
 
     async oauthLogin(req, res) {
         try {
-            const { provider, provider_id, name, email, avatar } = req.body
+            const { tokenId } = req.body
+            if(!token) return res.status(400).json({ error: "Token de autenticação inválido." })
+            
+            const ticket = await client.verifyIdToken({
+                idToken: tokenId,
+                audience: process.env.GOOGLE_CLIENT_ID,
+            })
 
-            if(!provider || !provider_id || !email) return res.status(400).json({ error: "Dados de autenticação inválidos. "})
+            const payload = ticket.getPayload()
+            if(!payload) return res.status(400).json({ error: "Erro ao validar token do Google." })
+
+            const { sub: provider_id, name, email, picture: avatar } = payload
+            const provider = "google"
         
             let user = await User.findOne({ where: { provider, provider_id }})
             if(!user) {

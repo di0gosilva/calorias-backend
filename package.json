@@ -2,7 +2,7 @@
   "name": "backend-calorias",
   "version": "1.0.0",
   "main": "index.js",
-  "type":"commonjs",
+  "type": "commonjs",
   "scripts": {
     "dev": "ts-node src/server.ts",
     "build": "tsc",
@@ -19,6 +19,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
+    "google-auth-library": "^9.15.1",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.14.0",
     "pg-hstore": "^2.3.4",
